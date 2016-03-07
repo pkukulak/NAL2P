@@ -52,8 +52,7 @@ function outSentence = preprocess( inSentence, language )
   outSentence = regexprep(outSentence, '-', ' $0 ');
   switch language
    case 'e'
-    % TODO: your code here
-
+    outSentence = regexprep(outSentence, '(\w''t|''\>)', ' $0');
    case 'f'
     outSentence = regexprep(outSentence, '(qu|[tcjml])''', '$0 ');
 
