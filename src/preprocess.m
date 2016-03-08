@@ -35,10 +35,10 @@ function outSentence = preprocess( inSentence, language )
   punc_rgx = '([.!?]+|[,;:-])\>';
   outSentence = regexprep(outSentence, punc_rgx, space_left);
   
-  left_math_rgx = '\<\w*[+-<>=]';
+  left_math_rgx = '\<\d+[+-<>=]';
   outSentence = regexprep(outSentence, left_math_rgx, space_right);
   
-  right_math_rgx = '[+-<>=]\w*\>';
+  right_math_rgx = '[+-<>=]\d+\>';
   outSentence = regexprep(outSentence, right_math_rgx, space_left);
   
   left_special_rgx = '\<[()"'']';
@@ -50,6 +50,7 @@ function outSentence = preprocess( inSentence, language )
   % splitting dashes; has to be fixed to only split dashes that are
   % between parenthesized words
   outSentence = regexprep(outSentence, '-', ' $0 ');
+  
   switch language
    case 'e'
     outSentence = regexprep(outSentence, '(\w''t|''\>)', ' $0');
