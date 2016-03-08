@@ -40,18 +40,15 @@ DD = dir( [ dataDir, filesep, '*', language] );
 disp([ dataDir, filesep, '.*', language] );
 
 for iFile=1:length(DD)
-
   lines = textread([dataDir, filesep, DD(iFile).name], '%s','delimiter','\n');
 
   for l=1:length(lines)
-
     processedLine =  preprocess(lines{l}, language);
     % We append 'EOL' to each sentence to ensure we hit
     % the marker SENTEND.
     words = [strsplit(' ', processedLine), 'EOL'];
     
     for i=1:length(words)-1
-        
         % Discard empty strings that sometimes occur in data.
         if (isempty(words{i}) || isempty(words{i+1})) 
             continue 
@@ -82,11 +79,8 @@ for iFile=1:length(DD)
             LM.bi.(words{i}).(words{i+1}) = ...
                              LM.bi.(words{i}).(words{i+1}) + 1;
         end
-        
     end
-    
   end
-  
 end
 
 save( fn_LM, 'LM', '-mat'); 
