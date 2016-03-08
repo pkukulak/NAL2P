@@ -46,12 +46,42 @@ for iFile=1:length(DD)
   for l=1:length(lines)
 
     processedLine =  preprocess(lines{l}, language);
-    words = strsplit(' ', processedLine );
+    words = strsplit(' ', processedLine);
     
-    % TODO: THE STUDENT IMPLEMENTS THE FOLLOWING
+    for i=2:length(words)
+        
+        if (isempty(words{i-1}) || isempty(words{i})) 
+            continue 
+        end 
+        
+        % Check if the unigram does not occur in the unigram substruct.
+        if ( ~isfield(LM.uni, (words{i-1})) ) 
+            LM.uni.(words{i-1}) = 1;
+        % Otherwise, increment it's unigram count.
+        else
+            LM.uni.(words{i-1}) = LM.uni.(words{i-1}) + 1;
+        end
 
-    % TODO: THE STUDENT IMPLEMENTED THE PRECEDING
+        % Check if the first word in the 
+        % bigram does not occur in the bigram substruct.
+        if ( ~isfield(LM.bi, (words{i-1})) )
+            LM.bi.(words{i-1}) = struct((words{i}), 1);
+        % Otherwise, check if the bigram word occurs as a field
+        % in the bigram substruct's substruct corresponding to the
+        % unigram word.
+        elseif ( ~isfield(LM.bi.(words{i-1}), (words{i})) )
+            LM.bi.(words{i-1}).(words{i}) = 1;
+        % Otherwise, the entire bigram has been seen before and currently
+        % holds a value in the bigram substruct.
+        else
+            LM.bi.(words{i-1}).(words{i}) = ...
+                             LM.bi.(words{i-1}).(words{i}) + 1;
+        end
+        
+    end
+    
   end
+  
 end
 
 save( fn_LM, 'LM', '-mat'); 
