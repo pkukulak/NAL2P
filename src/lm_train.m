@@ -52,6 +52,7 @@ for iFile=1:length(DD)
     
     for i=1:length(words)-1
         
+        % Discard empty strings that sometimes occur in data.
         if (isempty(words{i}) || isempty(words{i+1})) 
             continue 
         end 
@@ -68,11 +69,13 @@ for iFile=1:length(DD)
         % bigram does not occur in the bigram substruct.
         if ( ~isfield(LM.bi, (words{i})) )
             LM.bi.(words{i}) = struct((words{i+1}), 1);
+            
         % Otherwise, check if the bigram word occurs as a field
         % in the bigram substruct's substruct corresponding to the
         % unigram word.
         elseif ( ~isfield(LM.bi.(words{i}), (words{i+1})) )
             LM.bi.(words{i}).(words{i+1}) = 1;
+            
         % Otherwise, the entire bigram has been seen before and currently
         % holds a value in the bigram substruct.
         else
