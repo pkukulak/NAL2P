@@ -32,8 +32,11 @@ function outSentence = preprocess( inSentence, language )
   space_left = ' $0';
   space_right = '$0 ';
   
-  punc_rgx = '([.!?]+|[,;:-])\>';
-  outSentence = regexprep(outSentence, punc_rgx, space_left);
+  right_punc_rgx = '([.!?]+|[,;:-$%&*])';
+  outSentence = regexprep(outSentence, right_punc_rgx, space_left);
+  
+  left_punc_rgx = '([.!?]+|[,:;-$%&*])';
+  outSentence = regexprep(outSentence, left_punc_rgx, space_right);
   
   left_math_rgx = '\<\d+[+-<>=]';
   outSentence = regexprep(outSentence, left_math_rgx, space_right);
@@ -41,10 +44,10 @@ function outSentence = preprocess( inSentence, language )
   right_math_rgx = '[+-<>=]\d+\>';
   outSentence = regexprep(outSentence, right_math_rgx, space_left);
   
-  left_special_rgx = '\<[()"'']';
+  left_special_rgx = '[\[\]{}()`"]';
   outSentence = regexprep(outSentence, left_special_rgx, space_right);
   
-  right_special_rgx = '[()"'']\>';
+  right_special_rgx = '[\[\]{}()"`]';
   outSentence = regexprep(outSentence, right_special_rgx, space_left);
   
   % splitting dashes; has to be fixed to only split dashes that are
@@ -53,9 +56,9 @@ function outSentence = preprocess( inSentence, language )
   
   switch language
    case 'e'
-    outSentence = regexprep(outSentence, '(\w''t|''\>)', ' $0');
+    outSentence = regexprep(outSentence, '(\w''t|''s?\>)', ' $0');
    case 'f'
-    outSentence = regexprep(outSentence, '(qu|[tcjml])''', '$0 ');
+    outSentence = regexprep(outSentence, '(qu|\<[tcjml])''', '$0 ');
 
   end
 

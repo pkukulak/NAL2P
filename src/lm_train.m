@@ -46,7 +46,9 @@ for iFile=1:length(DD)
     processedLine =  preprocess(lines{l}, language);
     % We append 'EOL' to each sentence to ensure we hit
     % the marker SENTEND.
-    words = [strsplit(' ', processedLine), 'EOL'];
+    words_whitespace = textscan(processedLine, '%s');
+    words = [words_whitespace{1}.', 'EOL'];
+    %words = [strsplit(' ', processedLine), 'EOL'];
     
     for i=1:length(words)-1
         % Discard empty strings that sometimes occur in data.
