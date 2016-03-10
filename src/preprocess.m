@@ -32,10 +32,10 @@ function outSentence = preprocess( inSentence, language )
   space_left = ' $0';
   space_right = '$0 ';
   
-  right_punc_rgx = '([.!?]+|[,;:-$%&*])';
+  right_punc_rgx = '([.!?]+|[,;:]|\*|\&|\$|\%|/)';
   outSentence = regexprep(outSentence, right_punc_rgx, space_left);
   
-  left_punc_rgx = '([.!?]+|[,:;-$%&*])';
+  left_punc_rgx = '([.!?]+|[,:;]|\*|\&|\$|\%|/)';
   outSentence = regexprep(outSentence, left_punc_rgx, space_right);
   
   left_math_rgx = '\<\d+[+-<>=]';
