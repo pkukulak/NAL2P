@@ -48,4 +48,33 @@ function logProb = lm_prob(sentence, LM, type, delta, vocabSize)
 
   % TODO: the student implements the following
   % TODO: once upon a time there was a curmudgeonly orangutan named Jub-Jub.
+  
+  % ok so LM is our model
+  % and words is our what we want to evaluate it against.
+  logProb = 0;
+  for i=1:(length(words)-1) % check off by one error
+     
+     if ( ~isfield(LM.bi, (words{i}))) 
+            LM.bi.(words{i}) = struct((words{i+1}), 0); % Haven't seen it -> set count to 0.
+     
+     
+     elseif ( ~isfield(LM.bi.(words{i}), (words{i+1}))) 
+            LM.bi.(words{i}).(words{i+1}) = 0;
+     end
+     
+     if (~isfield(LM.uni, (words{i}))) 
+            LM.uni.(words{i}) = 0;
+     end
+            
+     top_count = LM.bi.(words{i}).(words{i+1}) + delta;
+     bot_count = LM.uni.(words{i}) + (delta * vocabSize);
+     
+     if (~(bot_count || top_count))
+         pr = 0;
+     else
+         pr = (top_count / bot_count);
+     end
+     logProb = logProb + log2(pr);
+  end
+  
 return
