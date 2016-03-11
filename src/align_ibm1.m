@@ -42,6 +42,7 @@ function AM = align_ibm1(trainDir, numSentences, maxIter, fn_AM)
 
   % Iterate between E and M steps
   for iter=1:maxIter,
+    disp(iter);
     AM = em_step(AM, eng, fre);
   end
 
@@ -95,15 +96,14 @@ function [eng, fre] = read_hansard(mydir, numSentences)
       %if length(lines_e) < numSentences
       %    numSentences = length(lines_e);
       %end
-      
       % Read numSentences lines from each file
       for iter=1:length(lines_e)
           count = count + 1;
           english_sentence = lines_e{iter};
           french_sentence = lines_f{iter};
           
-          eng{iter} = strsplit(' ',  preprocess(english_sentence, 'e'));
-          fre{iter} = strsplit(' ',  preprocess(french_sentence, 'f'));
+          eng{count} = strsplit(' ',  preprocess(english_sentence, 'e'));
+          fre{count} = strsplit(' ',  preprocess(french_sentence, 'f'));
           if (count == numSentences)
               return
           end
@@ -175,11 +175,6 @@ function t = em_step(t, eng, fre)
       
       unique_words_e = unique(eng{i});
       unique_words_f = unique(fre{i});
-      %eng{i}
-      %fre{i}
-      %unique_words_e
-      %unique_words_f
-      %fieldnames(t.SENTEND)
       
       for j=1:length(unique_words_f)
           denom_c = 0;
@@ -233,9 +228,11 @@ function t = em_step(t, eng, fre)
   for i=1:length(english_words)
       english_word = (english_words{i});
       associated_french_words = fieldnames(tcount.(english_word));
+      
       for j=1:length(associated_french_words)
           french_word = (associated_french_words{j});
-          t.(english_word).(french_word) = tcount.(english_word).(french_word) / total.(english_word);
+          t.(english_word).(french_word) = ...
+              tcount.(english_word).(french_word) / total.(english_word);
       end
       
   end
