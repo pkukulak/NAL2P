@@ -56,9 +56,9 @@ function logProb = lm_prob(sentence, LM, type, delta, vocabSize)
      
      if ( ~isfield(LM.bi, (words{i}))) 
             LM.bi.(words{i}) = struct((words{i+1}), 0); % Haven't seen it -> set count to 0.
+     end
      
-     
-     elseif ( ~isfield(LM.bi.(words{i}), (words{i+1}))) 
+     if ( ~isfield(LM.bi.(words{i}), (words{i+1}))) 
             LM.bi.(words{i}).(words{i+1}) = 0;
      end
      
