@@ -9,15 +9,23 @@ d = 0            13.9209
 d = 0.01         40.4767
 d = 0.05         49.5622
 d = 0.1          57.2990
-d = 0.5
+d = 0.5          93.4564
 
 French
 Delta            Perplexity
 ----------------------------
 d = 0           13.0829
 d = 0.01        40.9612
-d = 0.05
-d = 0.1
-d = 0.5
+d = 0.05        53.3261
+d = 0.1         63.4553
+d = 0.5        111.2159
 
 Summary of Results
+
+We observed that the perplexities increased as 
+we added smoothing, and then increased the delta value.
+For each pair of english & french data points, the observed
+perplexity values were quite similar. As we increased the 
+delta value, the differences began to diverge: initially,
+their difference was approximately 0.8, while when delta was
+0.5, their difference was approximately 18.
