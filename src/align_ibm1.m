@@ -74,12 +74,7 @@ function [eng, fre] = read_hansard(mydir, numSentences)
 %
 %         eng{i} = strsplit(' ', preprocess(english_sentence, 'e'));
 %
-  %eng = {};
-  %fre = {};
 
-  % TODO: your code goes here.
-  
-  % 
   eng = {};
   fre = {};
   
@@ -92,11 +87,6 @@ function [eng, fre] = read_hansard(mydir, numSentences)
       lines_e = textread([mydir, filesep, dir_e(iFile).name], '%s','delimiter','\n');
       lines_f = textread([mydir, filesep, dir_f(iFile).name], '%s','delimiter','\n');
       
-      % Out of bounds check
-      %if length(lines_e) < numSentences
-      %    numSentences = length(lines_e);
-      %end
-      % Read numSentences lines from each file
       for iter=1:length(lines_e)
           count = count + 1;
           english_sentence = lines_e{iter};
@@ -162,12 +152,6 @@ function t = em_step(t, eng, fre)
 % One step in the EM algorithm.
 %
   
-  % TODO: your code goes here
-  
-  % okay so t is our current AM model
-  % eng and fre are cell-arrays of cell-arrays.
-  % We adjust the current model and return it.
-  
   tcount = struct(); % assume non-existant field -> field is zero.
   total = struct();
   % First loop over sentence pairs
@@ -180,13 +164,8 @@ function t = em_step(t, eng, fre)
           denom_c = 0;
           for k=1:length(unique_words_e)
               Fcountf = cellfun(@(x) sum(ismember((unique_words_f{j}),x)), fre(i));
-
-              %if (strcmp(evalc(['disp(t.(unique_words_e{k}))']), 'SENTEND'))
-              %    fieldnames(t.(unique_words_e{k}))
-              %    Pfe = 0;
-              %else
               Pfe = t.(unique_words_e{k}).(unique_words_f{j});
-              %end
+            
               % Count occurences of the word in the sentence.
               denom_c = denom_c + (Fcountf * Pfe);         
           end
@@ -207,8 +186,7 @@ function t = em_step(t, eng, fre)
               tcount.(unique_words_e{k}).(unique_words_f{j}) = ...
                   tcount.(unique_words_e{k}).(unique_words_f{j}) + ...
                   Pfe * Ecounte * Fcountf / denom_c;
-              
-              
+      
               % Existence check on total
               if ~isfield(total, (unique_words_e{k}))
                   total.(unique_words_e{k}) = 0;
@@ -224,7 +202,9 @@ function t = em_step(t, eng, fre)
       
       
   end
+  
   english_words = fieldnames(total);
+  
   for i=1:length(english_words)
       english_word = (english_words{i});
       associated_french_words = fieldnames(tcount.(english_word));
