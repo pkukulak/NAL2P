@@ -65,8 +65,7 @@ scores       = zeros(N, length(frenchWords));
 % get english vocabulary, minus start and end tags
 SS = AM.( CSC401_A2_DEFNS.SENTSTART );
 SE = AM.( CSC401_A2_DEFNS.SENTEND );
-AM = rmfield(AM, CSC401_A2_DEFNS.SENTSTART );
-AM = rmfield(AM, CSC401_A2_DEFNS.SENTEND );
+
 VE = fieldnames(AM);
 AM.(CSC401_A2_DEFNS.SENTSTART ) = SS;
 AM.(CSC401_A2_DEFNS.SENTEND ) = SE;
@@ -97,6 +96,11 @@ for ifw=1:length(frenchWords)
   englishWords(:,ifw) = VE(ind(1:N));
 end 
 %englishWords
+
+%%%%%%%%%%%% WE FIXED THIS %%%%%%%%%%%%%%
+AM = rmfield(AM, CSC401_A2_DEFNS.SENTSTART );
+AM = rmfield(AM, CSC401_A2_DEFNS.SENTEND );
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % indices 
 wordInd = ones(1, length(frenchWords));

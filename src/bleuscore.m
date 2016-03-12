@@ -1,81 +1,98 @@
-function [uni, bi, tri] = bleuscore( references, candidate )
+function scores = bleuscore( references, cand )
 % Calculate the unigram, bigram, and trigram precision
 % scores for the candidate given the referencess
+warning('off', 'all');
 
-grams = struct();
+% Bluemix and decode2 were giving us serious problems.
+% This is our very hacky fix.
+cand = strsplit(' ', cand);
+cand = strjoin(cand(2:end-1));
+cand = regexprep(cand, ' SENTSTART', '');
+cand = ['SENTSTART ' cand ' SENTEND'];
+cand = strsplit(' ', cand);
 
-% Exclude SENTSTART and SENTEND tokens.
-candidate_length = length(candidate - 2);
+% A struct to keep track of unigrams, bigrams, and trigrams in
+% the given reference sentences and candidate sentence.
+ref_n_grams = struct();
+cand_n_grams = struct();
+
+
+% Variables to determine brevity constants.
 diff = Inf;
-split_candidate = textscan(candidate, '%s');
+r = 0;
+N = length(cand) - 2;
 
-bi_ind = 2;
-bi_count = 0;
+% C values for unigrams, bigrams, and trigrams.
+c_u = 0;
+c_b = 0;
+c_t = 0;
 
-tri_ind = 3;
-tri_count = 0;
-
-for ref=1:length(references)
-    % Exclude SENTSTART and SENTEND tokens.
-    reference_length = length(references{ref});
-    reference = strsplit(references{ref}, ' ');
+% Build the reference n-gram struct.
+for k=1:length(references)
+    % Index counters. We start one word into the sentence and end
+    % one word early to avoid the SENTSTART and SENTEND markers.
+    u_i = 2;
+    b_i = 3;
+    ref = strsplit(' ', references{k});
     
-    % Find the nearest length among the references.
-    if abs(candidate_length - reference_length) < diff
-        diff = abs(candidate_length - reference_length);
-        nearest_ref_length = reference_length;
+    % Check if the current reference sentences is the nearest in length
+    % to the candidate.
+    if abs(length(ref) - N) < diff
+        r = length(ref);
+        diff = length(ref) - N;
     end
     
-    % Do not consider SENTSTART and SENTEND as words.
-    % Get the words in each reference.
-    for word=2:length(reference) - 1
-        uni_word = reference{word};
-        bi_word = reference{bi_ind};
-        tri_word = reference{tri_ind};
+    for t_i=4:length(ref) - 1
+        ref_n_grams.(ref{u_i}).(ref{b_i}).(ref{t_i}) = 1;
+        ref_n_grams.(ref{b_i}) = (ref{t_i});
+        ref_n_grams.(ref{t_i}) = struct();
         
-        if ~isfield(grams, (uni_word))
-           grams.(uni_word) = struct();
-        end
-        
-        if bi_ind < length(ref) && ~isfield(grams.(uni_word), (bi_word))
-           grams.(uni_word).(bi_word) = struct();
-           bi_count = 1;
-        else
-           bi_count = bi_count + 1;
-        end
-        
-        if tri_ind < length(ref) && ~isfield(grams.(uni_word).(bi_word), ...
-                                             (tri_word))
-           grams.(uni_word).(bi_word).(tri_word) = struct();
-           tri_count = 1;
-        else
-           tri_count = tri_count + 1;
-        end
-        
-        bi_ind = bi_bind + 1;
-        tri_ind = tri_ind + 1;
+        u_i = b_i;
+        b_i = t_i;
     end
 end
 
+% Build the candidate n-gram struct and calculate precisions.
+u_i = 2;
+b_i = 3;
 
-C_uni = cellfun(@(x) sum(ismember(fieldnames(grams), x)), split_candidate);
-N_uni = candidate_length;
-
-p_uni = C_uni / N_uni;
-p_bi = bi_count / (N_uni - 1);
-p_tri = tri_count / (N_uni - 2);
+for t_i=4:length(cand) - 1
+    cand_n_grams.(cand{u_i}).(cand{b_i}).(cand{t_i}) = 1;
+    cand_n_grams.(cand{b_i}) = (cand{t_i});
+    cand_n_grams.(cand{t_i}) = struct();
+    
+    if isfield(ref_n_grams, (cand{u_i}))
+        c_u = c_u + 1;
+        if isfield(ref_n_grams.(cand{u_i}), (cand{b_i}))
+            c_b = c_b + 1;
+            if isfield(ref_n_grams.(cand{u_i}).(cand{b_i}), (cand{t_i}))
+                c_t = c_t + 1;
+            end
+        end
+    end
+    u_i = b_i;
+    b_i = t_i;
+end
 
 % Calculate the brevity penalty.
-brevity = nearest_ref_length / candidate_length;
-if (brevity < 1)
+brevity = r / N;
+if brevity < 1
     BP = 1;
 else
-    BP = exp(1 - brevity) ;
+    BP = exp(1 - brevity);
 end
 
-uni = BP * (p_uni);
-bi  = BP * ((p_uni*p_bi)^(1/2));
-tri = BP * ((p_uni*p_bi*p_tri)^(1/3));
+% Precision values.
+p_u = c_u / N;
+p_b = c_b / (N - 1);
+p_t = c_t / (N - 2);
+
+% BLEU scores.
+uni = ( BP ) * ( (p_u) );
+bi  = ( BP ) * (((p_u)*(p_b))^(1/2));
+tri = ( BP ) * (((p_u)*(p_b)*(p_t))^(1/3));
+
+scores = [uni, bi, tri];
 
 end
 
